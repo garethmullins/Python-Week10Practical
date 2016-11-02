@@ -2,7 +2,7 @@
 CP1404/CP5632 Practical
 Week 10
 File renaming and os examples
-CleanupFiles
+CleanupFilesV2
 """
 import os
 import shutil
@@ -17,21 +17,21 @@ def main():
 
     # Menu to operate this program
     menu_input = input("D\t(D)own a folder\n"
-                       "C\t(C)hange the current directory\n"
+                       "C\t(Ch)ange the current directory\n"
                        "R\t(R)eturn to the original directory ({})\n"
                        "F\t(F)ormat a folder of files\n"
-                       "S\t(S)ort a folder of files into folders by their extension\n"
-                       "Q\t(Q)uit".format(ORIGINAL_DIRECTORY)).upper()[0]
+                       "S\t(Ca)tegorize a folder of files into folders named by the user\n"
+                       "Q\t(Q)uit".format(ORIGINAL_DIRECTORY)).upper()
 
-    while menu_input != "Q":
-        if menu_input == "D":
+    while menu_input[0].upper() != "Q":
+        if menu_input[0].upper() == "D":
             # Change the working directory to a subdirectory
             try:
                 os.chdir(os.getcwd() + "//" + input("\nPlease enter the sub directory name or folder name"))
             except OSError:
                 print("An error occurred while accessing the folder entered")
 
-        elif menu_input == "C":
+        elif menu_input[0].upper() + menu_input[1].lower() == "Ch":
             # Change the currently working directory to a directory of th euser's choosing
             try:
                 os.chdir(input("\nPlease enter the new directory in it's entirety"))
@@ -51,22 +51,22 @@ def main():
                 to_format = os.getcwd()
             else:
                 to_format = os.getcwd() + "\\" + to_format
-            dirs = directory_walk(do_not_touch, to_format)
+            dirs = directory_walk(to_format)
             # check if there are any sub-directories
             if len(dirs) >= 1:
                 walk_subdirectories(dirs, do_not_touch)
             os.chdir(current_directory)
 
-        elif menu_input == "S":
-            # Sort each file (and those inside a subdirectory) inside of the subdirectory specified by the user
+        elif menu_input[0].upper() + menu_input[1].lower() == "Ca":
+            # Categorize each file inside of the subdirectory specified by the user
             current_directory = os.getcwd()
-            to_sort = input("\nPlease enter the name of the folder that contains the files to be sorted, "
-                            "if it's the current folder, enter nothing")
-            if to_sort == "":
-                to_sort = os.getcwd()
+            to_categorize = input("\nPlease enter the name of the folder that contains the files to be categorized, "
+                                  "if it's the current folder, enter nothing")
+            if to_categorize == "":
+                to_categorize = os.getcwd()
             else:
-                to_sort = os.getcwd() + "\\" + to_sort
-            sort_files(to_sort)
+                to_categorize = os.getcwd() + "\\" + to_categorize
+            categorize_files(to_categorize)
             os.chdir(current_directory)
 
         else:
@@ -75,10 +75,10 @@ def main():
         # Reopen the menu
         print("\nCurrently working directory: ", os.getcwd())
         menu_input = input("D\t(D)own a folder\n"
-                           "C\t(C)hange the current directory\n"
+                           "C\t(Ch)ange the current directory\n"
                            "R\t(R)eturn to the original directory ({})\n"
                            "F\t(F)ormat a folder of files\n"
-                           "S\t(S)ort a folder of files into folders by their extension\n"
+                           "S\t(Ca)tegorize a folder of files into folders named by the user\n"
                            "Q\t(Q)uit".format(ORIGINAL_DIRECTORY)).upper()[0]
 
 
@@ -172,67 +172,68 @@ def reformat_filename(file_list):
 
 # All three sections put together as one
 """
-def sort_files(directory):
+def categorize_files(directory):
     \"""
-
-    :param directory:
-    :return:
+    Categorize the files into folders named by the user
+    :param directory: The directory that the folders are located
+    :return: None
     \"""
     extensions = []
-    sorted_something = False
+    categorised_something = False
     os.chdir(directory)
     for root, dirs, files in os.walk("."):
         for file in files:
             extension = os.path.splitext(file)[1].replace(".", "")
             if extension not in extensions:
                 extensions.append(extension)
+                categorised_something = True
         for extension in extensions:
-            if title == ".":
-                title = extension
+            title = input("What category would you like to sort {} files into?".format(extension))
+
             destination_dir_name = os.getcwd() + "\\" + title
             # make a new directory
             try:
                 os.mkdir(destination_dir_name)
-        except OSError:
-            pass
+            except OSError:
+                pass
+
         files = os.listdir(".")
         for file in files:
             if os.path.splitext(file)[1].replace(".", "") == extension:
                 # move file to the destination directory
                 shutil.move(file, destination_dir_name + "\\" + file)
                 print("Files with the extension {} have been moved.".format(extension))
-        return None
-            sorted_something = True
-        if sorted_something:
-            print("\nFiles are sorted")
+        if categorised_something:
+            print("\nFiles are categorized")
         else:
-            print("Nothing to sort")
+            print("Nothing to categorize")
         return None
 """
 
 
-def sort_files(directory):
+def categorize_files(directory):
     """
-    Sort the files into folders designated by file extensions
+    Categorize the files into folders named by the user
     :param directory: The directory that the folders are located
     :return: None
     """
     extensions = []
-    sorted_something = False
+    categorised_something = False
     os.chdir(directory)
     for root, dirs, files in os.walk("."):
         for file in files:
             extension = os.path.splitext(file)[1].replace(".", "")
             if extension not in extensions:
                 extensions.append(extension)
-                sorted_something = True
+                categorised_something = True
         for extension in extensions:
-            destination_dir_name = create_directory(extension)
+            title = input("What category would you like to sort {} files into?".format(extension))
+            destination_dir_name = create_directory(title)
             move_files_by_extension(destination_dir_name, extension)
-        if sorted_something:
-            print("\nFiles are sorted")
+        if categorised_something:
+            print("\nFiles are categorized")
         else:
-            print("Nothing to sort")
+            print("Nothing to categorize")
         return None
 
 
